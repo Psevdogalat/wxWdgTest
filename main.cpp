@@ -5,8 +5,8 @@ class MainFrame : public wxFrame
 	public:
 		MainFrame();		
 
-		void onEvent(wxCommandEvent& event);
-		void onExit	(wxCommandEvent& event);
+		void OnEvent(wxCommandEvent& event);
+		void OnExit	(wxCommandEvent& event);
 };
 
 class App : public wxApp
@@ -16,6 +16,7 @@ class App : public wxApp
 
 	public:
 		virtual bool OnInit();
+		virtual int	 OnExit(); 
 };
 
 
@@ -33,6 +34,13 @@ bool App::OnInit()
 	return true;
 }
 
+int App::OnExit()
+{
+	//mainFrame->Close();
+	//delete mainFrame;
+	return 0;
+}
+
 MainFrame::MainFrame()
 	: wxFrame(nullptr, wxID_ANY, "Hello world")
 {
@@ -47,16 +55,16 @@ MainFrame::MainFrame()
 
 	SetMenuBar( menuBar);
 
-	Bind(wxEVT_MENU, &MainFrame::onEvent, this, ID_Event);
-	Bind(wxEVT_MENU, &MainFrame::onExit, this, wxID_EXIT);
+	Bind(wxEVT_MENU, &MainFrame::OnEvent, this, ID_Event);
+	Bind(wxEVT_MENU, &MainFrame::OnExit, this, wxID_EXIT);
 }
 
-void MainFrame::onEvent(wxCommandEvent& event)
+void MainFrame::OnEvent(wxCommandEvent& WXUNUSED(event))
 {
 	printf("ouppss!\n");
 }
 
-void MainFrame::onExit(wxCommandEvent& event)
+void MainFrame::OnExit(wxCommandEvent& WXUNUSED(event))
 {
 	Close(true);
 }
