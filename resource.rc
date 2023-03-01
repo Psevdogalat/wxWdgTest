@@ -1,0 +1,23 @@
+#include <windows.h>
+
+#include <wx\msw\wx.rc>
+
+VS_VERSION_INFO VERSIONINFO
+	FILEVERSION 	0,0,0,1
+	PRODUCTVERSION 	0,0,0,3
+	FILEFLAGS		0x1L
+	FILEOS 			0x4L
+	FILETYPE		0x1L
+	FILESUBTYPE		0x0L
+{
+	BLOCK "StringFileInfo"
+	{
+		BLOCK "0419"
+		{
+			VALUE "Comments",		"comment\0"
+			VALUE "CompanyName",	"void\0"
+			VALUE "ProductVersion", "0.0.0.2 TP\0"
+		}
+	}
+
+}
