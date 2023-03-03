@@ -11,7 +11,7 @@ WX_CXXFLAGS= -Wall -Wundef -Wunused-parameter -Wno-ctor-dtor-privacy \
 
 CXXFLAGS= $(DPREDEF) $(INCLUDE) $(WX_CXXFLAGS)
 
-LDFLAGS_GUI= -mwindows
+#LDFLAGS_GUI= -mwindows
 LDFLAGS= $(LDFLAGS_GUI)
 
 OBJS= main.o resource.o
