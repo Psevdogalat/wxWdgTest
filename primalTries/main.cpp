@@ -144,7 +144,7 @@ wxControl * createControl(
 			case CT_Choice:
 				control = new wxChoice(parent, id, 
 					position, record.size
-				)
+				);
 
 				((wxChoice*)control)->Insert(3, items, 0);
 
