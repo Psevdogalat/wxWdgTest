@@ -1,6 +1,9 @@
 #include <wx/wx.h>
 #include <wx/activityindicator.h>
 
+
+const char* appName = "sizeers test";
+
 class MainFrame : public wxFrame
 {
 	public:
@@ -13,10 +16,16 @@ class MainFrame : public wxFrame
 		void OnResize	(wxSizeEvent& );
 		void OnControlCommand(wxCommandEvent& );
 	private:
-		wxControl * testControl;
-		wxButton * enButton;
-		wxButton * disButton;	
+		wxControl 	* testControl;
+		wxButton 	* enButton;
+		wxButton 	* disButton;	
 		wxActivityIndicator * activityIndicator;
+		
+		wxStatusBar * statusBar;
+		wxListBox	* listBox;
+		wxTextCtrl	* logBox;
+		wxListBox	* propBox;
+		wxTextCtrl	* cmdBox;
 
 };
 
@@ -55,114 +64,9 @@ int App::OnExit()
 	return 0;
 }
 
-enum ControlType
-{
-	CT_Button = 0,
-	CT_StaticText,
-	CT_CheckBox,
-	CT_ListBox,
-	CT_CheckListBox,
-	CT_Choice
-};
-
-const char* ControlTypeStrings[] =
-{
-	"Button",
-	"StaticText",
-	"CheckBox",
-	"ListBox",
-	"CheckListBox",
-	"Choice"
-};
-
-const wxSize defaultControlSize = wxSize(200, 150);
-
-struct _controlTableRecord{
-	const char*  name;
-	const char*  caption;
-	wxWindowID	 id;
-	ControlType  controlType;
-	wxSize		 size;
-}controlsTable[] = 
-{
-	{"button",		"btn1",		0, CT_Button, 		defaultControlSize},
-	{"static",		"static1",	0, CT_StaticText,	defaultControlSize},
-	{"checkbox",	"chk1",		0, CT_CheckBox,		defaultControlSize},
-	{"listbox",		"lsb1",		0, CT_ListBox,		defaultControlSize},
-	{"CListBox",	"clsb1",	0, CT_CheckListBox,	defaultControlSize},
-	{"Choice",		"choice1",	0, CT_Choice,		defaultControlSize}
-};
-
-
-wxControl * createControl(
-	wxWindow * 	parent, 
-	wxWindowID 	id, 
-	wxPoint		position,
-	_controlTableRecord& record
-){
-	wxControl * control;
-	
-	static const wxString items[]=
-	{
-		wxString("Item1"), wxString("Item2"), wxString("Item3")
-	};
-
-	switch(record.controlType)
-		{
-			case CT_Button:
-				control = new wxButton(parent, id, 
-					wxString(record.caption), position, record.size
-				);
-			
-			break;	
-			case CT_StaticText:
-				control = new wxStaticText(parent, id, 
-					wxString(record.caption), position, record.size
-				);
-			case CT_CheckBox:
-				control = new wxCheckBox(parent, id, 
-					wxString(record.caption), position, record.size
-				);
-
-			break;
-			case CT_ListBox:
-				control = new wxListBox(parent, id, 
-					position, record.size
-				);
-				
-				((wxListBox*)control)->InsertItems(3, items, 0);
-
-			break;
-			case CT_CheckListBox:
-				control = new wxCheckListBox(parent, id, 
-					position, record.size
-				);
-
-				((wxCheckListBox*)control)->InsertItems(3, items, 0);
-
-			break;
-			case CT_Choice:
-				control = new wxChoice(parent, id, 
-					position, record.size
-				);
-
-				((wxChoice*)control)->Insert(3, items, 0);
-
-
-			break;
-			default:
-				printf("undefine type\n");
-				return nullptr;	
-		}
-
-	return control;
-}
-
-wxControl ** controlsMass;
-unsigned int controlsNum;
 
 MainFrame::MainFrame()
-	: wxFrame(nullptr, wxID_ANY, "wxWdgTest", wxDefaultPosition, 
+	: wxFrame(nullptr, wxID_ANY, appName, wxDefaultPosition, 
 		wxSize(500, 700))
 {
 	wxMenu * menuFile = new wxMenu();
@@ -180,100 +84,84 @@ MainFrame::MainFrame()
 	Bind(wxEVT_MENU, &MainFrame::OnExit, this, wxID_EXIT);
 
 	wxWindow * parent = 
-		new wxScrolledWindow(this, wxID_ANY, wxDefaultPosition,
-			wxDefaultSize, wxVSCROLL);
+		new wxPanel(this, wxID_ANY, wxDefaultPosition, wxDefaultSize);
 
+	listBox = 
+	new wxListBox(parent, wxID_ANY, wxDefaultPosition, wxSize(400, 300));
 	
-	controlsNum = sizeof(controlsTable)/sizeof(_controlTableRecord);
-	controlsMass = new wxControl* [controlsNum];
+	propBox = 
+	new wxListBox(parent, wxID_ANY, wxDefaultPosition, wxSize(200, 300));
 
-	_controlTableRecord* tableRecord = NULL;
-	wxControl *		control;
-	wxWindowID		controlId;
-	wxPoint 		controlPosition;
-	wxStaticText *	caption;
+	cmdBox =
+	new wxTextCtrl(parent, wxID_ANY, wxEmptyString, 
+		wxDefaultPosition, wxSize(400, -1));
 	
-	controlPosition = wxPoint(150, 10);
+	logBox =
+	new wxTextCtrl(parent, wxID_ANY, wxEmptyString, 
+		wxDefaultPosition, wxSize(600, 200), 
+		wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL);
 
-	for(unsigned int i = 0; i < controlsNum; i++)
+	statusBar = new wxStatusBar(this, wxID_ANY);
+
+	wxString items[]=
 	{
-		tableRecord = &controlsTable[i];
-		controlId 	= i + 3;
-		
-		control = createControl(parent, controlId, 
-			controlPosition, *tableRecord);
-			
-		if(!control)
-			break;
+		wxString("Item1"),
+		wxString("Item2"),
+		wxString("Item3")
+	};
 
-		(i%2 == 0)?
-			control->SetBackgroundColour(*wxWHITE):
-			control->SetBackgroundColour(*wxCYAN);
-		
-		caption = 
-			new wxStaticText(parent, wxID_ANY, 
-			wxString(tableRecord->name), 
-			wxPoint(10, controlPosition.y + tableRecord->size.y/2 - 15),
-			wxSize(90, 30));
+	listBox->Append(3, items);
+	propBox->Append(3, items);
 
-		controlPosition += wxSize(0, tableRecord->size.y);
-	}
+	wxBoxSizer * sizer0 = new wxBoxSizer( wxVERTICAL);
+	sizer0->Add(listBox, 1, wxEXPAND);
+	sizer0->Add(cmdBox,  0, wxEXPAND | wxNORTH, 10);
 	
-	parent->SetVirtualSize(wxSize(350, controlPosition.y));
-	((wxScrolledWindow*)parent)->SetScrollRate(0, 10);
+	wxBoxSizer * sizer1 = new wxBoxSizer(wxHORIZONTAL);
+	sizer1->Add(sizer0,  1, wxEXPAND | wxALL, 5);
+	sizer1->Add(propBox, 0, wxEXPAND | wxALL, 5);
+	
+	wxBoxSizer * sizer2 = new wxBoxSizer( wxVERTICAL);
+	sizer2->Add(sizer1, 1, wxEXPAND);
+	sizer2->Add(logBox, 0, wxEXPAND | wxALL, 5);	
+	
+	parent->SetSizerAndFit(sizer2);
+	parent->Layout();	
 
+	SetStatusBar(statusBar);
+	SetMinSize(wxSize(640, 420));
+	
 }
 
 MainFrame::~MainFrame()
 {
 	printf("main frame destroy \n");
-	delete [] controlsMass;	
 }
 
 void MainFrame::OnEvent(wxCommandEvent& WXUNUSED(event))
 {
-	printf("ouppss!\n");
+	printf("OnEvent\n");
 }
 
 void MainFrame::OnExit(wxCommandEvent& WXUNUSED(event))
 {
-	printf("MainFrameClose\n");
+	printf("OnExit\n");
 	Close(true);
 }
 
 void MainFrame::OnButton(wxCommandEvent& event)
 {
-	switch(event.GetId())
-	{
-		case ID_EnButton:
-			enButton->Disable();
-			disButton->Enable();
-			testControl->Enable();						
-			activityIndicator->Start();
-
-		break;
-		case ID_DisButton:
-			enButton->Enable();
-			disButton->Disable();			
-			testControl->Disable();
-			activityIndicator->Stop();
-
-		break;
-		default:
-			printf("any button click\n");
-	}	
-
+	printf("OnButton\n");
 }
 
 void MainFrame::OnControlCommand(wxCommandEvent& event)
 {
-
+	printf("OnControlCommand\n");
 }
 
 void MainFrame::OnResize(wxSizeEvent& event)
 {
-
-	printf("resize\n");
+	printf("OnResize\n");
 }
 
 
